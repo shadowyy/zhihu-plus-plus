@@ -6,7 +6,16 @@ on:
       - master
     tags:
       - '*'
+  # 新增：手动触发时可以选择版本类型
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: '构建类型'
+        required: true
+        type: choice
+        options:
+          - nightly
+          - release
 
 permissions:
   contents: write
@@ -14,18 +23,22 @@ permissions:
 jobs:
   build:
     uses: ./.github/workflows/my-build-action.yml
-    if: startsWith(github.ref, 'refs/heads')
+    # 分支推送 或 手动选择nightly
+    if: startsWith(github.ref, 'refs/heads') && github.event.inputs.build_type != 'release'
     with:
       name: 'Nightly Builds'
     secrets: inherit
-#  build_minified_release:
-#    uses: ./.github/workflows/my-build-action.yml
-#    if: startsWith(github.ref, 'refs/heads/')
-#    with:
-#      name: 'Minified Builds'
-#      minify: true
-#      nightly_release: true
-#    secrets: inherit
+
+  # 手动触发 Release 版本
+  manual_release:
+    uses: ./.github/workflows/my-build-action.yml
+    if: github.event.inputs.build_type == 'release'
+    with:
+      name: 'Manual Release'
+      release: true
+      minify: true
+    secrets: inherit
+
   release:
     uses: ./.github/workflows/my-build-action.yml
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
