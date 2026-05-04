@@ -87,7 +87,7 @@ fun ExportDialogComponent(
         val coroutineScope = rememberCoroutineScope()
         var commentCount by remember { mutableIntStateOf(3) }
         var isExporting by remember { mutableStateOf(false) }
-        var includeAppAttribution by remember { mutableStateOf(true) }
+        var includeAppAttribution by remember { mutableStateOf(false) }
 
         Dialog(onDismissRequest = onDismiss) {
             Card(
